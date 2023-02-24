@@ -30,7 +30,7 @@ public class PlayerCam : MonoBehaviour
         
 
         xRotation -= inputY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        xRotation = Mathf.Clamp(xRotation, -65f, 90f);
 
         transform.localRotation= Quaternion.Euler(xRotation, 0f, 0f);
         bodyCamPos.Rotate(Vector3.up * inputX);
