@@ -10,6 +10,10 @@ public class WeaponController : MonoBehaviour
 
     public bool isAttack;
 
+    public bool canReload;
+
+    public bool isReload;
+
     public Transform weapon;
 
     [Header("Weapon Effects")] public AudioSource weaponSound;
@@ -46,6 +50,7 @@ public class WeaponController : MonoBehaviour
     void Update()
     {
         FireDelay();
+        AmmoCheck();
     }
 
     public void FireDelay()
@@ -75,21 +80,48 @@ public class WeaponController : MonoBehaviour
         CheckTargetTag();
     }
 
-    public void AmmoCheck()
+    public IEnumerator Reload()
     {
-        canAttack = true;
+        Debug.Log("Reloading..");
+        canAttack = false;
+        isReload = true;
+
+        weaponAnim.SetBool("isReload", true);
+
+        yield return new WaitForSeconds(2f); // Wait for Reload time seconds
+
+        weaponAnim.SetBool("isReload", false);
+
+        ammoCurrentBullet = ammoClipCapacity;
+        ammoRemaining -= ammoClipCapacity;
 
         weaponAMMO.text = $"{ammoCurrentBullet} / {ammoRemaining}";
-        if (ammoCurrentBullet <= 0) // Auto Reload
+
+        canAttack = true;
+        isReload = false;
+    }
+
+    public void AmmoCheck()
+    {
+        weaponAMMO.text = $"{ammoCurrentBullet} / {ammoRemaining}";
+
+        if ((ammoCurrentBullet <= 0 || Input.GetKeyDown(KeyCode.R)) && !isReload) // Auto Reload
         {
-            ammoCurrentBullet = ammoClipCapacity;
-            ammoRemaining -= ammoClipCapacity;
-            weaponAMMO.text = $"{ammoCurrentBullet} / {ammoRemaining}";
-            if (ammoCurrentBullet == ammoClipCapacity && ammoRemaining == 0)
+            StartCoroutine(Reload()); // Starts the reload coroutine
+            if (ammoRemaining <= 0)
             {
-                Debug.Log("NEED MORE AMMO"); // STOPS ATTACK FUNC.
+                Debug.Log("Need to Claim AmmoBox");
                 canAttack = false;
             }
+        }
+        else if (ammoRemaining <= 0 && ammoCurrentBullet <= 0)
+        {
+            canAttack = false;
+        }
+
+        else
+        {
+            canAttack = true;
         }
     }
 
