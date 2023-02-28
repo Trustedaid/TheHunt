@@ -70,14 +70,17 @@ public class WeaponController : MonoBehaviour
 
     public void Shoot()
     {
-        weaponEffect.Play();
-        weaponSound.Play();
-        weaponAnim.Play("Recoil");
+        if (!isReload)
+        {
+            weaponEffect.Play();
+            weaponSound.Play();
+            weaponAnim.Play("Recoil");
 
-        ammoCurrentBullet--;
-        AmmoCheck();
-
-        CheckTargetTag();
+            ammoCurrentBullet--;
+            
+            AmmoCheck();
+            CheckTargetTag();
+        }
     }
 
     public IEnumerator Reload()
