@@ -27,7 +27,7 @@ public class WeaponController : MonoBehaviour
 
     private Animator weaponAnim;
 
-    public TextMeshProUGUI weaponAMMO;
+    [FormerlySerializedAs("weaponAMMO")] public TextMeshProUGUI weaponAmmo;
 
     [Header("AMMO Settings")] public float fireRate;
     private float _fireRate;
@@ -37,13 +37,19 @@ public class WeaponController : MonoBehaviour
     public int ammoRemaining;
     public int ammoCurrentBullet;
 
+    public float reloadTime = 2f;
+
+
+    public float weaponDamage = 10f;
+
 
     // Start is called before the first frame update
     void Start()
     {
         weaponAnim = GetComponent<Animator>();
-        weaponAMMO.text = $"{ammoCurrentBullet} / {ammoRemaining}";
+        weaponAmmo.text = $"{ammoCurrentBullet} / {ammoRemaining}";
         canAttack = true;
+        canReload = true;
     }
 
     // Update is called once per frame
@@ -55,7 +61,7 @@ public class WeaponController : MonoBehaviour
 
     public void FireDelay()
     {
-        if (Input.GetKey(KeyCode.Mouse0) && isAttack && canAttack && Time.time > _fireRate)
+        if (Input.GetKey(KeyCode.Mouse0) && isAttack && canAttack && Time.time > _fireRate && !isReload)
         {
             weaponAnim.SetBool("isFire", true);
             Shoot();
@@ -70,17 +76,14 @@ public class WeaponController : MonoBehaviour
 
     public void Shoot()
     {
-        if (!isReload)
-        {
-            weaponEffect.Play();
-            weaponSound.Play();
-            weaponAnim.Play("Recoil");
+        weaponEffect.Play();
+        weaponSound.Play();
+        weaponAnim.Play("Recoil");
 
-            ammoCurrentBullet--;
-            
-            AmmoCheck();
-            CheckTargetTag();
-        }
+        ammoCurrentBullet--;
+
+        AmmoCheck();
+        CheckTargetTag();
     }
 
     public IEnumerator Reload()
@@ -91,14 +94,14 @@ public class WeaponController : MonoBehaviour
 
         weaponAnim.SetBool("isReload", true);
 
-        yield return new WaitForSeconds(2f); // Wait for Reload time seconds
+        yield return new WaitForSeconds(reloadTime); // Wait for Reload time seconds
 
         weaponAnim.SetBool("isReload", false);
 
         ammoCurrentBullet = ammoClipCapacity;
         ammoRemaining -= ammoClipCapacity;
 
-        weaponAMMO.text = $"{ammoCurrentBullet} / {ammoRemaining}";
+        weaponAmmo.text = $"{ammoCurrentBullet} / {ammoRemaining}";
 
         canAttack = true;
         isReload = false;
@@ -106,25 +109,23 @@ public class WeaponController : MonoBehaviour
 
     public void AmmoCheck()
     {
-        weaponAMMO.text = $"{ammoCurrentBullet} / {ammoRemaining}";
+        weaponAmmo.text = $"{ammoCurrentBullet} / {ammoRemaining}";
 
-        if ((ammoCurrentBullet <= 0 || Input.GetKeyDown(KeyCode.R)) && !isReload) // Auto Reload
+        if ((ammoCurrentBullet <= 0 || Input.GetKeyDown(KeyCode.R)) && !isReload && canReload) // Auto Reload
         {
             StartCoroutine(Reload()); // Starts the reload coroutine
-            if (ammoRemaining <= 0)
-            {
-                Debug.Log("Need to Claim AmmoBox");
-                canAttack = false;
-            }
         }
-        else if (ammoRemaining <= 0 && ammoCurrentBullet <= 0)
+
+        else if (ammoCurrentBullet <= 0)
         {
             canAttack = false;
         }
+        
 
-        else
+        if (ammoRemaining <= 0)
         {
-            canAttack = true;
+            Debug.Log("Need to Claim AmmoBox");
+            canReload = false;
         }
     }
 
@@ -139,6 +140,8 @@ public class WeaponController : MonoBehaviour
             if (hitRay.transform.gameObject.CompareTag("Enemy"))
             {
                 Instantiate(bloodParticle, hitRay.point, Quaternion.LookRotation(hitRay.normal));
+
+                hitRay.transform.GetComponent<EnemyController>().GetDamage(weaponDamage);
             }
             else
             {
