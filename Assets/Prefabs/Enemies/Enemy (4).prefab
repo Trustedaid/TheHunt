@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2944584143122348237}
   - component: {fileID: 6392344705798314198}
   - component: {fileID: 1998001621320529995}
+  - component: {fileID: -6256672559057257649}
   m_Layer: 6
   m_Name: Enemy (4)
   m_TagString: Enemy
@@ -94,7 +95,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3895001617162663172}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
@@ -135,3 +136,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyHealth: 120
+  enemyDamage: 5
+--- !u!54 &-6256672559057257649
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3895001617162663172}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

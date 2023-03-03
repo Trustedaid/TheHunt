@@ -57,6 +57,8 @@ public class WeaponController : MonoBehaviour
     {
         FireDelay();
         AmmoCheck();
+        
+        
     }
 
     public void FireDelay()
@@ -65,17 +67,23 @@ public class WeaponController : MonoBehaviour
         {
             weaponAnim.SetBool("isFire", true);
             Shoot();
+            // Cursor.lockState = CursorLockMode.Locked; // locks the cursor
+            
 
             _fireRate = Time.time + fireRate;
         }
         else
         {
             weaponAnim.SetBool("isFire", false);
+            // Cursor.lockState = CursorLockMode.None; // unlocks the cursor
         }
     }
 
     public void Shoot()
     {
+        
+       
+        
         weaponEffect.Play();
         weaponSound.Play();
         weaponAnim.Play("Recoil");
